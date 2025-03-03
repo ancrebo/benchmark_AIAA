@@ -43,6 +43,9 @@ Parameters:
                 - epochs               : epochs to train
                 - save_every           : save every x epochs
                 - model_file           : file to save the model
+                - train_hist           : file to save the training history
+                - train_hist_fig       : figure to plot the training history
+                - file_norm            : file of the normalization values
 """
 
 #%% 
@@ -59,34 +62,37 @@ folder_file   = "folders_structure_2025_02_19.json"
 # Definition of the folder file
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 folder_data = {
-    "folder_database"      : "../BLdns1_3D_t00001-t01000",
+    "folder_database"      : "../../BLdns1_3D_t00001-t01000",
     "file_database"        : "BLdns1_3D_t$INDEX$.h5",
-    "folder_grid"          : "../grid",
+    "folder_grid"          : "../../grid",
     "file_grid"            : "BLdns1_grid.h5",
     "zfill_database"       : 5,
-    "folder_processeddata" : "../BLdns1_dudy_u15",
+    "folder_processeddata" : "../../BLdns1_dudy_u15",
     "file_processeddata"   : "BLdns1_dudy_u15_t$INDEX$.h5",
-    "statistics_folder"    : "../statistics",
+    "statistics_folder"    : "../../statistics",
     "mean_file"            : "BLdns1_means.h5",
     "unorm_file"           : "unorm_file.h5",
     "xclip"                : [1500,2000],
     "zclip"                : [100,200],
-    "tfrecords_folder"     : "../tfrecords",
+    "tfrecords_folder"     : "../../tfrecords",
     "padding"              : 5,
     "field_ini_train"      : 1,
-    "field_fin_train"      : 5,
+    "field_fin_train"      : 1000,
     "ngpu"                 : -1,
     "test_ratio"           : 0.2,
-    "batch_size"           : 1,
+    "batch_size"           : 8,
     "prefetch"             : -1,
-    "learat"               : 1e-4,
-    "nfil"                 : 4,
+    "learat"               : 1e-3,
+    "nfil"                 : 3,
     "kernel"               : 3,
     "stride"               : 1,
     "activation"           : "relu",
-    "epochs"               : 2000,
+    "epochs"               : 20,
     "save_every"           : 20,
-    "model_file"           : "model.h5"
+    "model_file"           : "model.h5",
+    "train_hist"           : "hist.txt",
+    "train_hist_fig"       : "hist.png",
+    "file_norm"            : "norm.h5"
     }
 
 

@@ -97,4 +97,5 @@ def read_mean_database(data_in : dict[dict[str,str]] =
     data_out["delta99"] = np.array(h5_file["delta99"]).reshape(-1)
     data_out["utau"]    = np.array(h5_file["utau"]).reshape(-1)
     data_out["nu"]      = data_out["utau"][0]*data_out["delta99"][0]/data_out["Retau"][0]
+    h5_file.close()
     return data_out                                  

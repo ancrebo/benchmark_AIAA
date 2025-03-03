@@ -115,4 +115,5 @@ def read_velocity_database(data_in : dict[dict[str,str],int] =
     data_out["u"] = np.transpose(np.array(h5_file["u"]),axes=(2,1,0))
     data_out["v"] = np.transpose(np.array(h5_file["v"]),axes=(2,1,0))
     data_out["w"] = np.transpose(np.array(h5_file["w"]),axes=(2,1,0))
+    h5_file.close()
     return data_out                                  
