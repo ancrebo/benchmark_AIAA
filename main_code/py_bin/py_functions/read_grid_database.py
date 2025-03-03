@@ -99,4 +99,5 @@ def read_grid_database(data_in : dict[dict[str,str]] =
     data_out["shape_x"] = len(data_out["x"])
     data_out["shape_y"] = len(data_out["yd"])
     data_out["shape_z"] = len(data_out["zd"])
+    h5_file.close()
     return data_out

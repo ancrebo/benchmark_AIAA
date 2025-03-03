@@ -19,12 +19,14 @@ from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, Activatio
 from tensorflow.keras import mixed_precision
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras import Model
+import matplotlib.pyplot as plt
+import h5py
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Definition of the parameters and folders structure
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
-config_folder = "../configurations"
+config_folder = "../../configurations"
 folder_file   = "folders_structure_2025_02_19.json"
 
 data_folder   = read_json(data_in={"folder" : config_folder,
@@ -78,20 +80,26 @@ tf.keras.backend.set_floatx("float32")
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Create the model
 # -------------------------------------------------------------------------------------------------------------------------------------------------
-xclip      = data_folder["xclip"]
-zclip      = data_folder["zclip"]
-padding    = data_folder["padding"]
-size_x     = xclip[1]-xclip[0]
-size_z     = zclip[1]-zclip[0]
-nfil       = data_folder["nfil"]
-kernel     = data_folder["kernel"]
-stride     = data_folder["stride"]
-activ      = data_folder["activation"]
-learat     = data_folder["learat"]
-batch_size = data_folder["batch_size"]
-epochs     = data_folder["epochs"]
-save_every = data_folder["save_every"]
-model_file = data_folder["model_file"]
+xclip             = data_folder["xclip"]
+zclip             = data_folder["zclip"]
+padding           = data_folder["padding"]
+size_x            = xclip[1]-xclip[0]
+size_z            = zclip[1]-zclip[0]
+nfil              = data_folder["nfil"]
+kernel            = data_folder["kernel"]
+stride            = data_folder["stride"]
+activ             = data_folder["activation"]
+learat            = data_folder["learat"]
+batch_size        = data_folder["batch_size"]
+epochs            = data_folder["epochs"]
+save_every        = data_folder["save_every"]
+model_file        = data_folder["model_file"]
+statistics_folder = data_folder["statistics_folder"]
+train_hist        = data_folder["train_hist"]
+train_hist_fig    = data_folder["train_hist_fig"]
+file_norm         = data_folder["file_norm"]
+field_ini         = data_folder["field_ini_train"]
+field_fin         = data_folder["field_fin_train"]
 
 mixed_precision.set_global_policy('mixed_float16')
 with strategy.scope():
@@ -102,8 +110,8 @@ with strategy.scope():
     # Architecture
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     nfil0    = nfil
-    nlay     = 7
-    deltaker = 8
+    nlay     = 2
+    deltaker = 4
     dker_vec = np.concatenate((np.arange(nlay), np.flip(np.arange(nlay))))*deltaker
     nfil_vec = nfil0 + dker_vec
     nfil_vec = np.concatenate((nfil_vec, [1]))
@@ -173,6 +181,55 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(model_file,
                                                          save_freq=int(save_every * (1-test_ratio)*len(field_range) // batch_size),  
                                                          verbose=1)
     
-train_hist = model.fit(data_train, batch_size = batch_size, epochs = epochs, verbose = 2, callbacks = [checkpoint_callback], 
+loss_hist = model.fit(data_train, batch_size = batch_size, epochs = epochs, verbose = 2, callbacks = [checkpoint_callback], 
                        validation_data = data_vali)
 
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+# save history
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+hmat = np.zeros((epochs,3))
+print("Create the file for the training epochs: ", flush=True)
+hmat[:,0] = np.arange(epochs)
+hmat[:,1] = loss_hist.history['loss']
+hmat[:,2] = loss_hist.history['val_loss']
+with open(statistics_folder+'/'+train_hist,'w') as filehist:
+    for line in hmat:
+        filehist.write(str(line[0])+','+str(line[1])+','+str(line[2])+'\n')
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+# plot folder
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+fig = plt.figure()
+plt.plot(hmat[:,0],hmat[:,1],label="loss")
+plt.plot(hmat[:,0],hmat[:,2],label="val_loss")
+plt.xlabel("epoch")
+plt.ylabel("mse")
+plt.legend()
+plt.savefig(train_hist_fig)
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+# calculate error
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+ff_norm   = h5py.File(file_norm,"r")
+u_y15_min = np.array(ff_norm["u_y15_min"])
+u_y15_max = np.array(ff_norm["u_y15_max"])
+dudy_min  = np.array(ff_norm["dudy_min"])
+dudy_max  = np.array(ff_norm["dudy_max"])
+ff_norm.close()
+for index in range(field_ini,field_fin):
+    # ---------------------------------------------------------------------------------------------------------------------------------------------
+    # TFRecords
+    # ---------------------------------------------------------------------------------------------------------------------------------------------
+    data_io         = read_input_output(data_in={"data_folder" : data_folder, "index" : index})
+    u_y15           = data_io["input"]
+    dudy            = data_io["output"]  
+    dudy_norm       = (dudy-dudy_min)/(dudy_max-dudy_min)
+    u_y15_norm      = (u_y15-u_y15_min)/(u_y15_max-u_y15_min)
+    data_X          = np.zeros((1,xclip[1]-xclip[0],zclip[1]-zclip[0],1))
+    data_Y          = np.zeros((1,xclip[1]-xclip[0]-2*padding,zclip[1]-zclip[0]-2*padding,1)) 
+    data_pred       = model.predict(data_X)
+    error          += abs(data_pred-data_Y)*(u_y15-u_y15_min)+u_y15_min
+error /= (field_fin-field_ini)

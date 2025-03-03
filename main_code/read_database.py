@@ -19,19 +19,21 @@ from py_bin.py_functions.serialize_example import serialize_example
 import tensorflow as tf
 from tqdm import tqdm
 import os
+import h5py
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Definition of the parameters and folders structure
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
-config_folder = "../configurations"
+config_folder = "../../configurations"
 folder_file   = "folders_structure_2025_02_19.json"
 
 data_folder   = read_json(data_in={"folder" : config_folder,
                                    "file"   : folder_file})
 
-field_ini     = 1
-field_fin     = 6
+field_ini     = data_folder["field_ini_train"]
+field_fin     = data_folder["field_fin_train"]
+file_norm     = data_folder["file_norm"]
 
 for index in range(field_ini,field_fin):
     print(f"Reading file {index} to calculate the normalization.")
@@ -56,6 +58,12 @@ for index in range(field_ini,field_fin):
         dudy_min  = np.min([dudy_min,np.min(dudy)])
         dudy_max  = np.max([dudy_max,np.max(dudy)])
         
+ff_norm   = h5py.File(file_norm,"w")
+ff_norm.create_dataset("u_y15_min",data=u_y15_min)
+ff_norm.create_dataset("u_y15_max",data=u_y15_max)
+ff_norm.create_dataset("dudy_min",data=dudy_min)
+ff_norm.create_dataset("dudy_max",data=dudy_max)
+ff_norm.close()
 
 xclip     = data_folder["xclip"]
 zclip     = data_folder["zclip"]
