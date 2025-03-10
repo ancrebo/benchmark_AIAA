@@ -4,7 +4,7 @@ Created on Fri Feb 28 19:33:26 2025
 
 @author: Andres Cremades Botella andrescb@kth.se
 File for training the database BLdns1_3D_t00001.h5 from https://deepblue.lib.umich.edu/data/concern/data_sets/nc580m959?locale=en
-This file trains the model based in the TFRecords:
+This file checks the results of the trained model.
     - input  : shear stress in the wall
     - output : velocity at y+=15
 """
