@@ -57,45 +57,32 @@ def read_grid_database(data_in : dict[dict[str,str]] =
     # Read data_folder
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "data_folder" in data_in:
-        data_folder = data_in["data_folder"]
-        if not isinstance(data_folder, dict):
-            raise TypeError(f"data_folder must be a dictionary, got {type(data_folder).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read folder_grid
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "folder_grid" in data_folder:
-                folder_grid = data_folder["folder_grid"]
-                if not isinstance(folder_grid, str):
-                    raise TypeError(f"key folder_grid from dictionary data_folder must be a string, got {type(folder_grid).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: folder_grid")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read file_grid
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "file_grid" in data_folder:
-                file_grid = data_folder["file_grid"]
-                if not isinstance(file_grid, str):
-                    raise TypeError(f"key file_grid from dictionary data_folder must be a string, got {type(file_grid).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: file_grid")
+        data_folder = dict(data_in["data_folder"])
     else:
         raise TypeError("key missing: data_folder")
-               
-    
+        
+    if "folder_grid" in data_folder:
+        folder_grid = str(data_folder["folder_grid"])
+    else:
+        raise TypeError("key missing in data_folder: folder_grid")
+    if "file_grid" in data_folder:
+        file_grid   = str(data_folder["file_grid"])
+    else:
+        raise TypeError("key missing in data_folder: file_grid")
+            
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # File to read
     # ---------------------------------------------------------------------------------------------------------------------------------------------
-    file_path           = folder_grid+'/'+file_grid
+    file_path           = folder_grid + '/' + file_grid
     h5_file             = h5py.File(file_path,'r')
     
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Save in data_out
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     data_out            = {}
-    data_out["x"]       = np.array(h5_file["x"],dtype="float").reshape(-1)
-    data_out["yd"]      = np.array(h5_file["yd"],dtype="float").reshape(-1)
-    data_out["zd"]      = np.array(h5_file["zd"],dtype="float").reshape(-1)
+    data_out["x"]       = np.array(h5_file["x"], dtype="float").reshape(-1)
+    data_out["yd"]      = np.array(h5_file["yd"], dtype="float").reshape(-1)
+    data_out["zd"]      = np.array(h5_file["zd"], dtype="float").reshape(-1)
     data_out["shape_x"] = len(data_out["x"])
     data_out["shape_y"] = len(data_out["yd"])
     data_out["shape_z"] = len(data_out["zd"])

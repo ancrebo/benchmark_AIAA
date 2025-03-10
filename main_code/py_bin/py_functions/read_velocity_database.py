@@ -56,47 +56,30 @@ def read_velocity_database(data_in : dict[dict[str,str],int] =
     # Read data_folder
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "data_folder" in data_in:
-        data_folder = data_in["data_folder"]
-        if not isinstance(data_folder, dict):
-            raise TypeError(f"data_folder must be a dictionary, got {type(data_folder).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read folder_database
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "folder_database" in data_folder:
-                folder_database = data_folder["folder_database"]
-                if not isinstance(folder_database, str):
-                    raise TypeError(f"key folder_database from dictionary data_folder must be a string, got {type(folder_database).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: folder_database")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read file_database
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "file_database" in data_folder:
-                file_database = data_folder["file_database"]
-                if not isinstance(file_database, str):
-                    raise TypeError(f"key file_database from dictionary data_folder must be a string, got {type(file_database).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: file_database")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read zpad_database
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "zfill_database" in data_folder:
-                zfill_database = data_folder["zfill_database"]
-                if not isinstance(zfill_database, int):
-                    raise TypeError(f"key zfill_database from dictionary data_folder must be a int, got {type(zfill_database).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: zfill_database")
+        data_folder = dict(data_in["data_folder"])
     else:
-        raise TypeError("key missing: data_folder")
+        raise TypeError("key missing: data_folder")            
         
+    if "folder_database" in data_folder:
+        folder_database = str(data_folder["folder_database"])
+    else:
+        raise TypeError("key missing in data_folder: folder_database")
+        
+    if "file_database" in data_folder:
+        file_database = str(data_folder["file_database"])
+    else:
+        raise TypeError("key missing in data_folder: file_database")
+        
+    if "zfill_database" in data_folder:
+        zfill_database = int(data_folder["zfill_database"])
+    else:
+        raise TypeError("key missing in data_folder: zfill_database")
+                
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Read index
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "index" in data_in:
-        index = data_in["index"]
-        if not isinstance(index, int):
-            raise TypeError(f"index must be a integer, got {type(index).__name__}")
+        index = int(data_in["index"])
     else:
         raise TypeError("key missing: index")
         

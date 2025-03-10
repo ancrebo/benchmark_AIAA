@@ -52,9 +52,7 @@ def read_json(data_in : dict[str,str,Union[List[str],None]] =
     # Read folder
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "folder" in data_in:
-        folder = data_in["folder"]
-        if not isinstance(folder, str):
-            raise TypeError(f"folder must be a string, got {type(folder).__name__}")
+        folder = str(data_in["folder"])
     else:
         raise TypeError("key missing: folder")
         
@@ -62,9 +60,7 @@ def read_json(data_in : dict[str,str,Union[List[str],None]] =
     # Read file
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "file" in data_in:
-        file = data_in["file"]
-        if not isinstance(file, str):
-            raise TypeError(f"file must be a string, got {type(file).__name__}")
+        file = str(data_in["file"])
     else:
         raise TypeError("key missing: file")
         
@@ -72,9 +68,7 @@ def read_json(data_in : dict[str,str,Union[List[str],None]] =
     # Read keys
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "keys" in data_in:
-        keys = data_in["keys"]
-        if keys is not None and not isinstance(keys, list):
-            raise TypeError(f"keys must be a list or None, got {type(keys).__name__}")
+        keys = list(data_in["keys"])
     else:
         keys = None
     

@@ -46,18 +46,14 @@ def serialize_example(data_in : dict[np.ndarray,np.ndarray] =
     # Read feature
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "feature" in data_in:
-        feature = data_in["feature"]
-        if not isinstance(feature, np.ndarray):
-            raise TypeError(f"feature must be a numpy array, got {type(feature).__name__}")
+        feature = np.array(data_in["feature"])
     else:
         raise TypeError("key missing: feature")
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Read label
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "label" in data_in:
-        label = data_in["label"]
-        if not isinstance(label, np.ndarray):
-            raise TypeError(f"feature must be a numpy array, got {type(label).__name__}")
+        label = np.array(data_in["label"])
     else:
         raise TypeError("key missing: label")
         

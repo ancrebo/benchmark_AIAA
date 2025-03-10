@@ -25,18 +25,21 @@ import h5py
 # Definition of the parameters and folders structure
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
-config_folder = "../../configurations"
-folder_file   = "folders_structure_2025_02_19.json"
+config_folder     = "../../configurations"
+folder_file       = "folders_structure_2025_02_19.json"
 
-data_folder   = read_json(data_in={"folder" : config_folder,
-                                   "file"   : folder_file})
+data_folder       = read_json(data_in={"folder" : config_folder,
+                                       "file"   : folder_file})
 
-field_ini     = data_folder["field_ini_train"]
-field_fin     = data_folder["field_fin_train"]
-file_norm     = data_folder["file_norm"]
+field_ini         = data_folder["field_ini_train"]
+field_fin         = data_folder["field_fin_train"]
+file_norm         = data_folder["file_norm"]
+statistics_folder = data_folder["statistics_folder"]
+
+print("Preparing data",flush=True)
 
 for index in range(field_ini,field_fin):
-    print(f"Reading file {index} to calculate the normalization.")
+    print(f"Reading file {index} to calculate the normalization.",flush=True)
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Read grid and velocity
     # ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,7 +61,7 @@ for index in range(field_ini,field_fin):
         dudy_min  = np.min([dudy_min,np.min(dudy)])
         dudy_max  = np.max([dudy_max,np.max(dudy)])
         
-ff_norm   = h5py.File(file_norm,"w")
+ff_norm   = h5py.File(statistics_folder + '/' + file_norm,"w")
 ff_norm.create_dataset("u_y15_min",data=u_y15_min)
 ff_norm.create_dataset("u_y15_max",data=u_y15_max)
 ff_norm.create_dataset("dudy_min",data=dudy_min)
