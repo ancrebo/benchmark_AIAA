@@ -106,38 +106,8 @@ field_fin         = data_folder["field_fin_train"]
 
 # mixed_precision.set_global_policy('mixed_float16')
 with strategy.scope():
-    shp    = (size_x,size_z,1)
-    inputs = Input(shape=shp)
-    
-    # ---------------------------------------------------------------------------------------------------------------------------------------------
-    # Architecture
-    # ---------------------------------------------------------------------------------------------------------------------------------------------
-    nfil0    = nfil
-    nlay     = 10
-    deltaker = 8
-    dker_vec = np.concatenate((np.arange(nlay), np.flip(np.arange(nlay))))*deltaker
-    nfil_vec = nfil0 + dker_vec
-    nfil_vec = np.concatenate((nfil_vec, [1]))
-    nfil_ind = np.arange(len(nfil_vec))
-    
-    xii      = inputs
-    for ii_layer in nfil_ind:
-        if ii_layer == np.max(nfil_ind):
-            activation = "sigmoid"
-        else:
-            activation = activ        
-        xii = Conv2D(nfil_vec[ii_layer], kernel_size=kernel, strides=(stride,stride), padding="same")(xii)
-        xii = BatchNormalization()(xii) 
-        xii = Activation(activ)(xii)
-        
-    # ---------------------------------------------------------------------------------------------------------------------------------------------
-    # Architecture
-    # ---------------------------------------------------------------------------------------------------------------------------------------------
-    
-    outputs = xii[:,padding:-padding,padding:-padding,:]
-    
     optimizer = RMSprop(learning_rate = learat, momentum = 0.9) 
-    model     = Model(inputs, outputs)
+    model = tf.keras.models.load_model(statistics_folder + '/' + model_file)
     model.compile(loss = tf.keras.losses.MeanSquaredError(), optimizer = optimizer)
 model.summary()
 
@@ -156,49 +126,13 @@ all_files       = sorted([os.path.join(tfrecord_folder, ff) for ff in os.listdir
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # List all tfrecord files
 # -------------------------------------------------------------------------------------------------------------------------------------------------
-num_train            = int((1-test_ratio)*len(field_range))
-tfrecord_files_train = [tfrecord_folder+"/dataset_"+str(index)+".tfrecord" for index in field_range[:num_train]]
-tfrecord_files_vali  = [tfrecord_folder+"/dataset_"+str(index)+".tfrecord" for index in field_range[num_train:]]
+tfrecord_files = [tfrecord_folder+"/dataset_"+str(index)+".tfrecord" for index in field_range]
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
-# Load the data
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-data_train = load_dataset(data_in={"tfrecord_files":tfrecord_files_train,"data_folder":data_folder})["parsed_data"]
-data_vali  = load_dataset(data_in={"tfrecord_files":tfrecord_files_vali,"data_folder":data_folder})["parsed_data"]
-
-if prefetch < 0:
-    prefetch = tf.data.AUTOTUNE
-data_train = data_train.batch(batch_size)
-data_vali  = data_vali.batch(batch_size)
-data_train = data_train.prefetch(prefetch)
-data_vali  = data_vali.prefetch(prefetch)
-data_train = data_train.with_options(options)
-data_vali  = data_vali.with_options(options)
-
-
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-# Train the data
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(statistics_folder + '/' + model_file,
-                                                         save_best_only=False, 
-                                                         save_freq=int(save_every * (1-test_ratio)*len(field_range) // batch_size),  
-                                                         verbose=1)
-    
-loss_hist = model.fit(data_train, batch_size = batch_size, epochs = epochs, verbose = 2, callbacks = [checkpoint_callback], 
-                       validation_data = data_vali)
-
-
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-# save history
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-hmat = np.zeros((epochs,3))
-print("Create the file for the training epochs: ", flush=True)
-hmat[:,0] = np.arange(epochs)
-hmat[:,1] = loss_hist.history['loss']
-hmat[:,2] = loss_hist.history['val_loss']
-with open(statistics_folder+'/'+train_hist,'w') as filehist:
-    for line in hmat:
-        filehist.write(str(line[0])+','+str(line[1])+','+str(line[2])+'\n')
+# read history
+# ------------------------------------------------------------------------------------------------------------------------------------------------- 
+with open(statistics_folder+'/'+train_hist, 'r') as fread:
+    hmat = np.array([[float(ii) for ii in line.split(',')] for line in fread])
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,7 +147,6 @@ plt.yscale("log")
 plt.legend()
 plt.savefig(statistics_folder + '/' + train_hist_fig)
 
-
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # calculate error
 # -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -224,13 +157,13 @@ dudy_min  = np.array(ff_norm["dudy_min"])
 dudy_max  = np.array(ff_norm["dudy_max"])
 ff_norm.close()
 error     = 0
-data_test = iter(load_dataset(data_in={"tfrecord_files":tfrecord_files_vali,
-                                       "data_folder":data_folder})["parsed_data"].batch(len(tfrecord_files_vali)))
+data_test = iter(load_dataset(data_in={"tfrecord_files":tfrecord_files,
+                                       "data_folder":data_folder})["parsed_data"].batch(len(tfrecord_files)))
 data_in_t, data_ou_t = next(data_test)
 data_in_t = data_in_t.numpy()
 data_ou_t = data_ou_t.numpy()
 data_pred = model.predict(data_in_t)
-error     = np.mean(abs(data_pred-data_ou_t)*(u_y15_max-u_y15_min)+u_y15_min)/np.max([abs(u_y15_max),abs(u_y15_min)])*100
+error     = np.mean(abs(data_pred-data_ou_t)*(u_y15_max-u_y15_min))/np.max([abs(u_y15_max),abs(u_y15_min)])*100
 
 data_grid    = read_grid_database(data_in={"data_folder" : data_folder})
 zgrid, xgrid = np.meshgrid(data_grid["zd"][zclip[0]:zclip[1]],data_grid["x"][xclip[0]:xclip[1]])

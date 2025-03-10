@@ -23,7 +23,7 @@ def load_dataset(data_in : dict[list,dict[list,list,int]] =
 
     Parameters
     ----------
-    data_in : dict[dict[str,str],int], optional
+    data_in : dict[list,dict[list,list,int]], optional
         The default is {"tfrecord_files": [],
                         "data_folder" : {"xclip"   : [],
                                          "zclip"   : [],
@@ -56,45 +56,30 @@ def load_dataset(data_in : dict[list,dict[list,list,int]] =
     # Read data_folder
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "tfrecord_files" in data_in:
-        tfrecord_files = data_in["tfrecord_files"]
-        if not isinstance(tfrecord_files, list):
-            raise TypeError(f"tfrecord_files must be a dictionary, got {type(tfrecord_files).__name__}")
+        tfrecord_files = list(data_in["tfrecord_files"])
     else:
         raise TypeError("key missing: tfrecord_files")
+        
     if "data_folder" in data_in:
-        data_folder = data_in["data_folder"]
-        if not isinstance(data_folder, dict):
-            raise TypeError(f"data_folder must be a dictionary, got {type(data_folder).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read xclip
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "xclip" in data_folder:
-                xclip = data_folder["xclip"]
-                if not isinstance(xclip, list):
-                    raise TypeError(f"key xclip from dictionary data_folder must be a list, got {type(xclip).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: xclip")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read zclip
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "zclip" in data_folder:
-                zclip = data_folder["zclip"]
-                if not isinstance(zclip, list):
-                    raise TypeError(f"key zclip from dictionary data_folder must be a list, got {type(zclip).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: zclip")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read padding
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "padding" in data_folder:
-                padding = data_folder["padding"]
-                if not isinstance(padding, int):
-                    raise TypeError(f"key padding from dictionary data_folder must be a int, got {type(padding).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: padding")
+        data_folder = dict(data_in["data_folder"])      
     else:
-        raise TypeError("key missing: data_folder")
+        raise TypeError("key missing: data_folder")  
+        
+    if "xclip" in data_folder:
+        xclip = list(data_folder["xclip"])            
+    else:
+        raise TypeError("key missing in data_folder: xclip")  
+          
+    if "zclip" in data_folder:
+        zclip = list(data_folder["zclip"])
+    else:
+        raise TypeError("key missing in data_folder: zclip") 
+           
+    if "padding" in data_folder:
+        padding = int(data_folder["padding"])
+    else:
+        raise TypeError("key missing in data_folder: padding")
+
     
     def parse_function(proto):
         """

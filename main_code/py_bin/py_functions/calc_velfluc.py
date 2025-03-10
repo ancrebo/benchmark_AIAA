@@ -22,9 +22,9 @@ def calc_velfluc(data_in : dict[dict[np.ndarray,np.ndarray,np.ndarray],dict[np.n
                                       "Vmean" : np.array([0]),
                                       "Wmean" : np.array([0])
                                       },
-                  "data_grid"      : {"shape_x" : np.array([0]),
-                                      "shape_y" : np.array([0]),
-                                      "shape_z" : np.array([0]),}
+                  "data_grid"      : {"shape_x" : 0,
+                                      "shape_y" : 0,
+                                      "shape_z" : 0}
                   }) -> dict:
     """
     Function to calculate the velocity fluctuations
@@ -39,7 +39,9 @@ def calc_velfluc(data_in : dict[dict[np.ndarray,np.ndarray,np.ndarray],dict[np.n
                         "data_mean"      : {"Umean" : np.array([0]),
                                             "Vmean" : np.array([0]),
                                             "Wmean" : np.array([0])
-                                            }
+                                            },
+                        "data_grid"      : {"shape_x" : 0,
+                                            "shape_y" : 0}
                         }.
         Data:
             - data_velocity : dictionary containing the velocity data:
@@ -50,6 +52,9 @@ def calc_velfluc(data_in : dict[dict[np.ndarray,np.ndarray,np.ndarray],dict[np.n
                 + Umean : mean streamwise velocity
                 + Vmean : mean wall-normal velocty
                 + Wmean : mean spanwise velocity
+            - data_grid     : dictionary containing the grid data:
+                + shape_x : shape of the grid in the x direction
+                + shape_y : shape of the grid in the y direction
 
     Returns
     -------
@@ -68,113 +73,61 @@ def calc_velfluc(data_in : dict[dict[np.ndarray,np.ndarray,np.ndarray],dict[np.n
     # Read data_velocity
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "data_velocity" in data_in:
-        data_velocity = data_in["data_velocity"]
-        if not isinstance(data_velocity, dict):
-            raise TypeError(f"data_velocity must be a dictionary, got {type(data_velocity).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read u
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "u" in data_velocity:
-                u_vel = data_velocity["u"]
-                if not isinstance(u_vel, np.ndarray):
-                    raise TypeError(f"key u from dictionary data_velocity must be a numpy array, got {type(u_vel).__name__}")
-            else:
-                raise TypeError("key missing in data_velocity: u")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read v
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "v" in data_velocity:
-                v_vel = data_velocity["v"]
-                if not isinstance(v_vel, np.ndarray):
-                    raise TypeError(f"key v from dictionary data_velocity must be a numpy array, got {type(v_vel).__name__}")
-            else:
-                raise TypeError("key missing in data_velocity: v")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read w
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "w" in data_velocity:
-                w_vel = data_velocity["w"]
-                if not isinstance(w_vel, np.ndarray):
-                    raise TypeError(f"key w from dictionary data_velocity must be a numpy array, got {type(w_vel).__name__}")
-            else:
-                raise TypeError("key missing in data_velocity: w")
+        data_velocity = dict(data_in["data_velocity"])
     else:
         raise TypeError("key missing: data_velocity")
+        
+    if "u" in data_velocity:
+        u_vel = np.array(data_velocity["u"])
+    else:
+        raise TypeError("key missing in data_velocity: u")
+    if "v" in data_velocity:
+        v_vel = np.array(data_velocity["v"])
+    else:
+        raise TypeError("key missing in data_velocity: v")
+    if "w" in data_velocity:
+        w_vel = np.array(data_velocity["w"])
+    else:
+        raise TypeError("key missing in data_velocity: w")
+        
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Read data_mean
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "data_mean" in data_in:
-        data_mean = data_in["data_mean"]
-        if not isinstance(data_mean, dict):
-            raise TypeError(f"data_mean must be a dictionary, got {type(data_mean).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read Umean
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "Umean" in data_mean:
-                Umean = data_mean["Umean"]
-                if not isinstance(Umean, np.ndarray):
-                    raise TypeError(f"key Umean from dictionary data_mean must be a numpy array, got {type(Umean).__name__}")
-            else:
-                raise TypeError("key missing in data_mean: Umean")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read Vmean
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "Vmean" in data_mean:
-                Vmean = data_mean["Vmean"]
-                if not isinstance(Vmean, np.ndarray):
-                    raise TypeError(f"key Vmean from dictionary data_mean must be a numpy array, got {type(Vmean).__name__}")
-            else:
-                raise TypeError("key missing in data_mean: Vmean")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read Wmean
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "Wmean" in data_mean:
-                Wmean = data_mean["Wmean"]
-                if not isinstance(Wmean, np.ndarray):
-                    raise TypeError(f"key Wmean from dictionary data_mean must be a numpy array, got {type(Wmean).__name__}")
-            else:
-                raise TypeError("key missing in data_mean: Wmean")
+        data_mean = dict(data_in["data_mean"])   
     else:
         raise TypeError("key missing: data_mean")
+        
+    if "Umean" in data_mean:
+        Umean = np.array(data_mean["Umean"])
+    else:
+        raise TypeError("key missing in data_mean: Umean")
+    if "Vmean" in data_mean:
+        Vmean = np.array(data_mean["Vmean"])
+    else:
+        raise TypeError("key missing in data_mean: Vmean")
+    if "Wmean" in data_mean:
+        Wmean = np.array(data_mean["Wmean"])
+    else:
+        raise TypeError("key missing in data_mean: Wmean")
+
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Read data_grid
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "data_grid" in data_in:
-        data_grid = data_in["data_grid"]
-        if not isinstance(data_grid, dict):
-            raise TypeError(f"data_grid must be a dictionary, got {type(data_grid).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read shape_x
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "shape_x" in data_grid:
-                shape_x = data_grid["shape_x"]
-                if not isinstance(shape_x, int):
-                    raise TypeError(f"key Umean from dictionary data_grid must be a integer, got {type(shape_x).__name__}")
-            else:
-                raise TypeError("key missing in data_grid: shape_x")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read shape_y
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "shape_y" in data_grid:
-                shape_y = data_grid["shape_y"]
-                if not isinstance(shape_y, int):
-                    raise TypeError(f"key shape_y from dictionary data_grid must be a integer, got {type(shape_y).__name__}")
-            else:
-                raise TypeError("key missing in data_grid: shape_y")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read shape_z
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "shape_z" in data_grid:
-                shape_z = data_grid["shape_z"]
-                if not isinstance(shape_z, int):
-                    raise TypeError(f"key shape_z from dictionary data_grid must be a integer, got {type(shape_z).__name__}")
-            else:
-                raise TypeError("key missing in data_grid: shape_z")
+        data_grid = dict(data_in["data_grid"])
     else:
         raise TypeError("key missing: data_grid")
+    
+    if "shape_x" in data_grid:
+        shape_x = int(data_grid["shape_x"])
+    else:
+        raise TypeError("key missing in data_grid: shape_x")
+    if "shape_y" in data_grid:
+        shape_y = int(data_grid["shape_y"])
+    else:
+        raise TypeError("key missing in data_grid: shape_y")
+
     
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Calculate fluctuations

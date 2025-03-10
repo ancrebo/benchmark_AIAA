@@ -50,33 +50,19 @@ def read_mean_database(data_in : dict[dict[str,str]] =
     # Read data_folder
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     if "data_folder" in data_in:
-        data_folder = data_in["data_folder"]
-        if not isinstance(data_folder, dict):
-            raise TypeError(f"data_folder must be a dictionary, got {type(data_folder).__name__}")
-        else:
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read statistics_folder
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "statistics_folder" in data_folder:
-                statistics_folder = data_folder["statistics_folder"]
-                if not isinstance(statistics_folder, str):
-                    raise TypeError(f"key statistics_folder from dictionary data_folder must be a string, got {type(statistics_folder).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: statistics_folder")
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            # Read mean_file
-            # -------------------------------------------------------------------------------------------------------------------------------------
-            if "mean_file" in data_folder:
-                mean_file = data_folder["mean_file"]
-                if not isinstance(mean_file, str):
-                    raise TypeError(f"key mean_file from dictionary data_folder must be a string, got {type(mean_file).__name__}")
-            else:
-                raise TypeError("key missing in data_folder: mean_file")
+        data_folder = dict(data_in["data_folder"])
     else:
-        raise TypeError("key missing: data_folder")
+        raise TypeError("key missing: data_folder")            
         
-        
-    
+    if "statistics_folder" in data_folder:
+        statistics_folder = str(data_folder["statistics_folder"])
+    else:
+        raise TypeError("key missing in data_folder: statistics_folder")            
+    if "mean_file" in data_folder:
+        mean_file = str(data_folder["mean_file"])
+    else:
+        raise TypeError("key missing in data_folder: mean_file")
+   
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # File to read
     # ---------------------------------------------------------------------------------------------------------------------------------------------
