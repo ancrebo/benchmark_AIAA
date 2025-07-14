@@ -35,6 +35,9 @@ field_ini         = data_folder["field_ini_train"]
 field_fin         = data_folder["field_fin_train"]
 file_norm         = data_folder["file_norm"]
 statistics_folder = data_folder["statistics_folder"]
+folder_input      = data_folder["folder_input"]
+folder_output     = data_folder["folder_output"]
+zfill_database    = data_folder["zfill_database"]
 
 print("Preparing data",flush=True)
 
@@ -95,5 +98,19 @@ for index in range(field_ini,field_fin):
             data_serialize = {"feature":features.numpy(),"label":labels.numpy()}
             example        = serialize_example(data_in=data_serialize)["example"]
             writer.write(example)
+    
+    if not os.path.isdir(folder_input):
+        os.mkdir(folder_input)
+    if not os.path.isdir(folder_output):
+        os.mkdir(folder_output)
+    
+    ff_input = h5py.File(folder_input+'/DLdns1_3D_input_t'+str(index).zfill(zfill_database)+'.h5','w')
+    ff_input.create_dataset("dudy",data=data_X[0,:,:,0])
+    ff_input.close()
+    
+    ff_output = h5py.File(folder_output+'/DLdns1_3D_output_t'+str(index).zfill(zfill_database)+'.h5','w')
+    ff_output.create_dataset("u",data=data_Y[0,:,:,0])
+    ff_output.close()
+    
 
     

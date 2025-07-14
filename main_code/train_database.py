@@ -83,26 +83,35 @@ tf.keras.backend.set_floatx("float32")
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Create the model
 # -------------------------------------------------------------------------------------------------------------------------------------------------
-xclip             = data_folder["xclip"]
-zclip             = data_folder["zclip"]
-padding           = data_folder["padding"]
-size_x            = xclip[1]-xclip[0]
-size_z            = zclip[1]-zclip[0]
-nfil              = data_folder["nfil"]
-kernel            = data_folder["kernel"]
-stride            = data_folder["stride"]
-activ             = data_folder["activation"]
-learat            = data_folder["learat"]
-batch_size        = data_folder["batch_size"]
-epochs            = data_folder["epochs"]
-save_every        = data_folder["save_every"]
-model_file        = data_folder["model_file"]
-statistics_folder = data_folder["statistics_folder"]
-train_hist        = data_folder["train_hist"]
-train_hist_fig    = data_folder["train_hist_fig"]
-file_norm         = data_folder["file_norm"]
-field_ini         = data_folder["field_ini_train"]
-field_fin         = data_folder["field_fin_train"]
+xclip               = data_folder["xclip"]
+zclip               = data_folder["zclip"]
+padding             = data_folder["padding"]
+size_x              = xclip[1]-xclip[0]
+size_z              = zclip[1]-zclip[0]
+nfil                = data_folder["nfil"]
+kernel              = data_folder["kernel"]
+stride              = data_folder["stride"]
+activ               = data_folder["activation"]
+learat              = data_folder["learat"]
+batch_size          = data_folder["batch_size"]
+epochs              = data_folder["epochs"]
+save_every          = data_folder["save_every"]
+model_file          = data_folder["model_file"]
+statistics_folder   = data_folder["statistics_folder"]
+train_hist          = data_folder["train_hist"]
+train_hist_fig      = data_folder["train_hist_fig"]
+file_norm           = data_folder["file_norm"]
+field_ini           = data_folder["field_ini_train"]
+field_fin           = data_folder["field_fin_train"]
+folder_database     = data_folder["folder_database"]
+file_database       = data_folder["file_database"]
+zfill_database      = data_folder["zfill_database"]
+folder_train_input  = data_folder["folder_train_input"]
+folder_train_output = data_folder["folder_train_output"]
+folder_test_input   = data_folder["folder_test_input"]
+folder_test_output  = data_folder["folder_test_output"]
+folder_input        = data_folder["folder_input"]
+folder_output       = data_folder["folder_output"]
 
 # mixed_precision.set_global_policy('mixed_float16')
 with strategy.scope():
@@ -159,6 +168,28 @@ all_files       = sorted([os.path.join(tfrecord_folder, ff) for ff in os.listdir
 num_train            = int((1-test_ratio)*len(field_range))
 tfrecord_files_train = [tfrecord_folder+"/dataset_"+str(index)+".tfrecord" for index in field_range[:num_train]]
 tfrecord_files_vali  = [tfrecord_folder+"/dataset_"+str(index)+".tfrecord" for index in field_range[num_train:]]
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+# Save link to training and validation
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+for ii_field in field_range[:num_train]:
+    datafile_read_input  = folder_input+'/DLdns1_3D_input_t'+str(ii_field).zfill(zfill_database)+'.h5'
+    datafile_read_output = folder_output+'/DLdns1_3D_output_t'+str(ii_field).zfill(zfill_database)+'.h5'
+    if not os.path.isdir(folder_train_input):
+        os.mkdir(folder_train_input)
+    if not os.path.isdir(folder_train_output):
+        os.mkdir(folder_train_output)
+    os.link(datafile_read_input,folder_train_input+'/BLdns1_3D_train_input_t'+str(ii_field).zfill(zfill_database)+'.h5')
+    os.link(datafile_read_output,folder_train_output+'/BLdns1_3D_train_output_t'+str(ii_field).zfill(zfill_database)+'.h5')
+for ii_field in field_range[num_train:]:
+    datafile_read_input  = folder_input+'/DLdns1_3D_input_t'+str(ii_field).zfill(zfill_database)+'.h5'
+    datafile_read_output = folder_output+'/DLdns1_3D_output_t'+str(ii_field).zfill(zfill_database)+'.h5'
+    if not os.path.isdir(folder_test_input):
+        os.mkdir(folder_test_input)
+    if not os.path.isdir(folder_test_output):
+        os.mkdir(folder_test_output)
+    os.link(datafile_read_input,folder_test_input+'/BLdns1_3D_test_input_t'+str(ii_field).zfill(zfill_database)+'.h5')
+    os.link(datafile_read_output,folder_test_output+'/BLdns1_3D_test_output_t'+str(ii_field).zfill(zfill_database)+'.h5')
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Load the data
