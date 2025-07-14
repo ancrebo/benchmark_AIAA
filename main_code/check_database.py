@@ -4,7 +4,7 @@ Created on Fri Feb 28 19:33:26 2025
 
 @author: Andres Cremades Botella andrescb@kth.se
 File for training the database BLdns1_3D_t00001.h5 from https://deepblue.lib.umich.edu/data/concern/data_sets/nc580m959?locale=en
-This file trains the model based in the TFRecords:
+This file checks the results of the trained model.
     - input  : shear stress in the wall
     - output : velocity at y+=15
 """
@@ -173,20 +173,20 @@ print(zgrid.shape)
 print(data_in_t[0,:,:,0].shape)
 plt.pcolor(xgrid[padding:-padding,padding:-padding],zgrid[padding:-padding,padding:-padding],
            data_in_t[0,padding:-padding,padding:-padding,0])
-plt.title(r"Input data: \frac{du}{dy}")
+plt.title(r"Input data: $\frac{du}{dy}$")
 plt.xlabel("x")
 plt.ylabel("z")
 plt.savefig(statistics_folder + '/' + "input.png")
 fig          = plt.figure()
 plt.pcolor(xgrid[padding:-padding,padding:-padding],zgrid[padding:-padding,padding:-padding],
            data_ou_t[0,:,:,0])
-plt.title(r"Output data: u")
+plt.title(r"Output data: $u$")
 plt.xlabel("x")
 plt.ylabel("z")
 plt.savefig(statistics_folder + '/' + "output.png")
 fig          = plt.figure()
 plt.pcolor(xgrid[padding:-padding,padding:-padding],zgrid[padding:-padding,padding:-padding],data_pred[0,:,:,0])
-plt.title(r"Predicted data: u")
+plt.title(r"Predicted data: $u$")
 plt.xlabel("x")
 plt.ylabel("z")
 plt.savefig(statistics_folder + '/' + "pred.png") 

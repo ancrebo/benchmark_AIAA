@@ -92,7 +92,13 @@ folder_data = {
     "model_file"           : "model.h5",
     "train_hist"           : "hist.txt",
     "train_hist_fig"       : "hist.png",
-    "file_norm"            : "norm.h5"
+    "file_norm"            : "norm.h5",
+    "folder_train_input"   : "../../BLdns1_3D_train_input",
+    "folder_train_output"  : "../../BLdns1_3D_train_output",
+    "folder_test_input"    : "../../BLdns1_3D_test_input",
+    "folder_test_output"   : "../../BLdns1_3D_test_output",
+    "folder_input"         : "../../DLdns1_3D_input",
+    "folder_output"        : "../../DLdns1_3D_output"
     }
 
 
