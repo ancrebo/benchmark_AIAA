@@ -15,6 +15,7 @@ from py_bin.py_functions.load_dataset import load_dataset
 import tensorflow as tf
 import numpy as np
 import os
+import shutil
 from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, Activation
 from tensorflow.keras import mixed_precision
 from tensorflow.keras.optimizers import RMSprop, Adam
@@ -30,7 +31,7 @@ tf.keras.backend.set_floatx('float64')
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
 config_folder = "../../configurations"
-folder_file   = "folders_structure_2025_02_19.json"
+folder_file   = "folders_structure_2025_08_06.json"
 
 data_folder   = read_json(data_in={"folder" : config_folder,
                                    "file"   : folder_file})
@@ -150,13 +151,22 @@ with strategy.scope():
     model.compile(loss = tf.keras.losses.MeanSquaredError(), optimizer = optimizer)
 model.summary()
 
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+# Avoid corrupted files
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+file_not = h5py.File(statistics_folder + '/' + 'file_not.h5',"r")
+ind_not  = np.array(file_not["ind_not"])
+file_not.close()
+
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Selection of files for training
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 field_ini_train = data_folder["field_ini_train"]
 field_fin_train = data_folder["field_fin_train"]
 field_range     = np.arange(field_ini_train,field_fin_train)
-np.random.shuffle(field_range)
+field_range     = np.setdiff1d(field_range, ind_not)
+# np.random.shuffle(field_range)
 tfrecord_folder = data_folder["tfrecords_folder"]
 test_ratio      = data_folder["test_ratio"]
 prefetch        = data_folder["prefetch"]
@@ -175,19 +185,23 @@ tfrecord_files_vali  = [tfrecord_folder+"/dataset_"+str(index)+".tfrecord" for i
 for ii_field in field_range[:num_train]:
     datafile_read_input  = folder_input+'/DLdns1_3D_input_t'+str(ii_field).zfill(zfill_database)+'.h5'
     datafile_read_output = folder_output+'/DLdns1_3D_output_t'+str(ii_field).zfill(zfill_database)+'.h5'
-    if not os.path.isdir(folder_train_input):
-        os.mkdir(folder_train_input)
-    if not os.path.isdir(folder_train_output):
-        os.mkdir(folder_train_output)
+    if os.path.isdir(folder_train_input):
+        shutil.rmtree(folder_train_input)
+    if os.path.isdir(folder_train_output):
+        shutil.rmtree(folder_train_output)
+    os.mkdir(folder_train_input)
+    os.mkdir(folder_train_output)
     os.link(datafile_read_input,folder_train_input+'/BLdns1_3D_train_input_t'+str(ii_field).zfill(zfill_database)+'.h5')
     os.link(datafile_read_output,folder_train_output+'/BLdns1_3D_train_output_t'+str(ii_field).zfill(zfill_database)+'.h5')
 for ii_field in field_range[num_train:]:
     datafile_read_input  = folder_input+'/DLdns1_3D_input_t'+str(ii_field).zfill(zfill_database)+'.h5'
     datafile_read_output = folder_output+'/DLdns1_3D_output_t'+str(ii_field).zfill(zfill_database)+'.h5'
-    if not os.path.isdir(folder_test_input):
-        os.mkdir(folder_test_input)
-    if not os.path.isdir(folder_test_output):
-        os.mkdir(folder_test_output)
+    if os.path.isdir(folder_test_input):
+        shutil.rmtree(folder_test_input)
+    if os.path.isdir(folder_test_output):
+        shutil.rmtree(folder_test_output)
+    os.mkdir(folder_test_input)
+    os.mkdir(folder_test_output)
     os.link(datafile_read_input,folder_test_input+'/BLdns1_3D_test_input_t'+str(ii_field).zfill(zfill_database)+'.h5')
     os.link(datafile_read_output,folder_test_output+'/BLdns1_3D_test_output_t'+str(ii_field).zfill(zfill_database)+'.h5')
 

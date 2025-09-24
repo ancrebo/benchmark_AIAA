@@ -26,7 +26,7 @@ import h5py
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
 config_folder     = "../../configurations"
-folder_file       = "folders_structure_2025_02_19.json"
+folder_file       = "folders_structure_2025_08_06.json"
 
 data_folder       = read_json(data_in={"folder" : config_folder,
                                        "file"   : folder_file})
@@ -39,6 +39,7 @@ folder_input      = data_folder["folder_input"]
 folder_output     = data_folder["folder_output"]
 zfill_database    = data_folder["zfill_database"]
 
+ind_not           = []
 print("Preparing data",flush=True)
 
 for index in range(field_ini,field_fin):
@@ -46,7 +47,11 @@ for index in range(field_ini,field_fin):
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Read grid and velocity
     # ---------------------------------------------------------------------------------------------------------------------------------------------
-    data_io = read_input_output(data_in={"data_folder" : data_folder, "index" : index})
+    try:
+        data_io = read_input_output(data_in={"data_folder" : data_folder, "index" : index})
+    except:
+        ind_not.append(index)
+        continue
     u_y15   = data_io["input"]
     dudy    = data_io["output"]
     
@@ -77,10 +82,17 @@ padding   = data_folder["padding"]
 elem_spec = (tf.TensorSpec(shape=(xclip[1]-xclip[0],zclip[1]-zclip[0],1),dtype="float32"),
              tf.TensorSpec(shape=(xclip[1]-xclip[0],zclip[1]-zclip[0],1),dtype="float32"))
 os.makedirs(data_folder["tfrecords_folder"],exist_ok=True)
+
+file_not  = h5py.File(statistics_folder + '/' + 'file_not.h5',"w")
+file_not.create_dataset("ind_not",data=ind_not)
+file_not.close()
+
 for index in range(field_ini,field_fin):
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # TFRecords
     # ---------------------------------------------------------------------------------------------------------------------------------------------
+    if index in ind_not:
+        continue
     data_io         = read_input_output(data_in={"data_folder" : data_folder, "index" : index})
     u_y15           = data_io["input"]
     dudy            = data_io["output"]  
