@@ -112,11 +112,19 @@ with strategy.scope():
 model.summary()
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
+# Avoid corrupted files
+# -------------------------------------------------------------------------------------------------------------------------------------------------
+file_not = h5py.File(statistics_folder + '/' + 'file_not.h5',"w")
+ind_not  = np.array(file_not["ind_not"])
+file_not.close()
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------
 # Selection of files for training
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 field_ini_train = data_folder["field_ini_train"]
 field_fin_train = data_folder["field_fin_train"]
 field_range     = np.arange(field_ini_train,field_fin_train)
+field_range     = np.setdiff1d(field_range, ind_not)
 np.random.shuffle(field_range)
 tfrecord_folder = data_folder["tfrecords_folder"]
 test_ratio      = data_folder["test_ratio"]
