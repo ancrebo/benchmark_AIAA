@@ -26,7 +26,7 @@ import h5py
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
 config_folder     = "../../configurations"
-folder_file       = "folders_structure_2025_08_06.json"
+folder_file       =  "folders_structure_2025_10_01_train.json"
 
 data_folder       = read_json(data_in={"folder" : config_folder,
                                        "file"   : folder_file})
@@ -51,6 +51,7 @@ for index in range(field_ini,field_fin):
         data_io = read_input_output(data_in={"data_folder" : data_folder, "index" : index})
     except:
         ind_not.append(index)
+        print("Not found: "+str(index),flush=True)
         continue
     u_y15   = data_io["input"]
     dudy    = data_io["output"]
@@ -58,16 +59,18 @@ for index in range(field_ini,field_fin):
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Normalization
     # ---------------------------------------------------------------------------------------------------------------------------------------------
+    std_in = 5
+    std_on = 3
     if index == field_ini:
-        u_y15_min = np.min(u_y15)
-        u_y15_max = np.max(u_y15)
-        dudy_min  = np.min(dudy)
-        dudy_max  = np.max(dudy)
+        u_y15_min = np.min(u_y15) # np.mean(u_y15)-std_on*np.std(u_y15) #np.min(u_y15)
+        u_y15_max = np.max(u_y15) # np.mean(u_y15)+std_on*np.std(u_y15) #np.max(u_y15)
+        dudy_min  = np.min(dudy) # np.mean(dudy)-std_in*np.std(dudy) #np.min(dudy)
+        dudy_max  = np.max(dudy) # np.mean(dudy)+std_in*np.std(dudy) #np.max(dudy)
     else:
-        u_y15_min = np.min([u_y15_min,np.min(u_y15)])
-        u_y15_max = np.max([u_y15_max,np.max(u_y15)])
-        dudy_min  = np.min([dudy_min,np.min(dudy)])
-        dudy_max  = np.max([dudy_max,np.max(dudy)])
+        u_y15_min = np.min([u_y15_min,np.min(u_y15)]) # np.min([u_y15_min,np.mean(u_y15)-std_on*np.std(u_y15)]) #np.min([u_y15_min,np.min(u_y15)])
+        u_y15_max = np.max([u_y15_max,np.max(u_y15)]) # np.max([u_y15_max,np.mean(u_y15)+std_on*np.std(u_y15)]) #np.max([u_y15_max,np.max(u_y15)])
+        dudy_min  = np.min([dudy_min,np.min(dudy)]) # np.min([dudy_min,np.mean(dudy)-std_in*np.std(dudy)]) #np.min([dudy_min,np.min(dudy)])
+        dudy_max  = np.max([dudy_max,np.max(dudy)]) # np.max([dudy_max,np.mean(dudy)+std_in*np.std(dudy)]) #np.max([dudy_max,np.max(dudy)])
         
 ff_norm   = h5py.File(statistics_folder + '/' + file_norm,"w")
 ff_norm.create_dataset("u_y15_min",data=u_y15_min)

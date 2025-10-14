@@ -106,7 +106,6 @@ def read_input_output(data_in : dict[dict[list,list,int],int] =
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     # Plot velocity in y+=15
     # ---------------------------------------------------------------------------------------------------------------------------------------------
-
     index_y15 = np.argmin(abs(data_grid["y_plus"][0,:]-15))
     dudy      = data_velfluc["u"][xclip[0]:xclip[1],1,zclip[0]:zclip[1]]-data_velfluc["u"][xclip[0]:xclip[1],0,zclip[0]:zclip[1]]
     u_y15     = data_velfluc["u"][xclip[0]+padding:xclip[1]-padding,index_y15,zclip[0]+padding:zclip[1]-padding]
