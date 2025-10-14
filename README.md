@@ -15,16 +15,18 @@ The code has been tested using TensorFlow 2.10.
 
 The model is trained as shown below:
 
-![Image](https://github.com/user-attachments/assets/0fe9b446-441d-45b9-9111-e49eb7fb4b66)
+<img width="640" height="480" alt="hist" src="https://github.com/user-attachments/assets/e99103cf-47bf-47ac-8c69-f3a8742ed967" />
 
-This training corresponds to a mean error of 2.93% of the maximum value of the velocity at $y^+\approx 15$. The input field, $\frac{\partial u}{\partial y}$, is the following:
 
-![Image](https://github.com/user-attachments/assets/d0e01458-6306-4650-bfbe-38b4e10102c7)
+This training corresponds to a mean error of 4.05% of the maximum value of the velocity at $y^+\approx 15$. The input field, $\frac{\partial u}{\partial y}$, is the following:
+
+<img width="640" height="480" alt="input" src="https://github.com/user-attachments/assets/0296522a-d6d8-4bdb-8d49-276109961e46" />
 
 The output (ground truth): 
 
-![Image](https://github.com/user-attachments/assets/21d4a8ca-98e7-4b7c-b4a2-b0e2fe7de5ac)
+<img width="640" height="480" alt="output" src="https://github.com/user-attachments/assets/07437562-c5e6-436d-b504-2460c168e122" />
 
 And the predicted field:
 
-![Image](https://github.com/user-attachments/assets/59929f99-9e2f-47a9-9157-3effa51ae152)
+<img width="640" height="480" alt="pred" src="https://github.com/user-attachments/assets/bd73089a-0832-4acb-8dc5-b118b87bc906" />
+
