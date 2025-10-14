@@ -24,9 +24,10 @@ This training corresponds to a mean error of 4.05% of the maximum value of the v
 
 The output (ground truth): 
 
-<img width="640" height="480" alt="output" src="https://github.com/user-attachments/assets/07437562-c5e6-436d-b504-2460c168e122" />
+<img width="640" height="480" alt="output" src="https://github.com/user-attachments/assets/625a61e3-3371-4134-88fc-0418ba6feaee" />
 
 And the predicted field:
 
-<img width="640" height="480" alt="pred" src="https://github.com/user-attachments/assets/bd73089a-0832-4acb-8dc5-b118b87bc906" />
+<img width="640" height="480" alt="pred" src="https://github.com/user-attachments/assets/d1bd2310-8af8-48b5-b11b-542e82fc78e2" />
+
 
