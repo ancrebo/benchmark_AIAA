@@ -30,7 +30,7 @@ tf.keras.backend.set_floatx('float64')
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
 config_folder = "../../configurations"
-folder_file   = "folders_structure_2025_02_19.json"
+folder_file   = "folders_structure_2025_10_01_train.json"
 
 data_folder   = read_json(data_in={"folder" : config_folder,
                                    "file"   : folder_file})
@@ -114,9 +114,12 @@ model.summary()
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Avoid corrupted files
 # -------------------------------------------------------------------------------------------------------------------------------------------------
-file_not = h5py.File(statistics_folder + '/' + 'file_not.h5',"w")
-ind_not  = np.array(file_not["ind_not"])
-file_not.close()
+try:
+    file_not = h5py.File(statistics_folder + '/' + 'file_not.h5',"r")
+    ind_not  = np.array(file_not["ind_not"])
+    file_not.close()
+except:
+    ind_not  = []
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # Selection of files for training
@@ -172,6 +175,7 @@ data_in_t = data_in_t.numpy()
 data_ou_t = data_ou_t.numpy()
 data_pred = model.predict(data_in_t)
 error     = np.mean(abs(data_pred-data_ou_t)*(u_y15_max-u_y15_min))/np.max([abs(u_y15_max),abs(u_y15_min)])*100
+print(np.mean(abs(data_pred-data_ou_t)),flush=True)
 
 data_grid    = read_grid_database(data_in={"data_folder" : data_folder})
 zgrid, xgrid = np.meshgrid(data_grid["zd"][zclip[0]:zclip[1]],data_grid["x"][xclip[0]:xclip[1]])

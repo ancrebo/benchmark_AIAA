@@ -55,7 +55,7 @@ import json
 # Definition of the folder file
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 config_folder = "../../configurations"
-folder_file   = "folders_structure_2025_02_19.json"
+folder_file   = "folders_structure_2025_10_01_train.json"
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,28 +77,28 @@ folder_data = {
     "tfrecords_folder"     : "../../tfrecords",
     "padding"              : 5,
     "field_ini_train"      : 1,
-    "field_fin_train"      : 1000,
+    "field_fin_train"      : 2000,
     "ngpu"                 : -1,
     "test_ratio"           : 0.2,
-    "batch_size"           : 8,
+    "batch_size"           : 16,
     "prefetch"             : -1,
-    "learat"               : 1e-4,
+    "learat"               : 1e-3,
     "nfil"                 : 4,
     "kernel"               : 3,
     "stride"               : 1,
     "activation"           : "relu",
-    "epochs"               : 20,
+    "epochs"               : 500,
     "save_every"           : 20,
-    "model_file"           : "model.h5",
-    "train_hist"           : "hist.txt",
+    "model_file"           : "model_2025_10_01_train.h5",
+    "train_hist"           : "hist_2025_10_01_train.txt",
     "train_hist_fig"       : "hist.png",
     "file_norm"            : "norm.h5",
     "folder_train_input"   : "../../BLdns1_3D_train_input",
     "folder_train_output"  : "../../BLdns1_3D_train_output",
     "folder_test_input"    : "../../BLdns1_3D_test_input",
     "folder_test_output"   : "../../BLdns1_3D_test_output",
-    "folder_input"         : "../../DLdns1_3D_input",
-    "folder_output"        : "../../DLdns1_3D_output"
+    "folder_input"         : "../../BLdns1_3D_input",
+    "folder_output"        : "../../BLdns1_3D_output"
     }
 
 

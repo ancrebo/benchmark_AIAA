@@ -20,6 +20,7 @@ from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, Activatio
 from tensorflow.keras import mixed_precision
 from tensorflow.keras.optimizers import RMSprop, Adam
 from tensorflow.keras import Model
+from tensorflow import cast
 import matplotlib.pyplot as plt
 import h5py
 from py_bin.py_functions.read_input_output import read_input_output
@@ -31,7 +32,7 @@ tf.keras.backend.set_floatx('float64')
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 
 config_folder = "../../configurations"
-folder_file   = "folders_structure_2025_08_06.json"
+folder_file   = "folders_structure_2025_10_01_train.json"
 
 data_folder   = read_json(data_in={"folder" : config_folder,
                                    "file"   : folder_file})
@@ -114,7 +115,7 @@ folder_test_output  = data_folder["folder_test_output"]
 folder_input        = data_folder["folder_input"]
 folder_output       = data_folder["folder_output"]
 
-# mixed_precision.set_global_policy('mixed_float16')
+mixed_precision.set_global_policy('mixed_float16')
 with strategy.scope():
     shp    = (size_x,size_z,1)
     inputs = Input(shape=shp)
@@ -144,7 +145,7 @@ with strategy.scope():
     # Architecture
     # ---------------------------------------------------------------------------------------------------------------------------------------------
     
-    outputs = xii[:,padding:-padding,padding:-padding,:]
+    outputs = cast(xii[:,padding:-padding,padding:-padding,:],dtype="float32")
     
     optimizer = RMSprop(learning_rate = learat, momentum = 0.9) 
     model     = Model(inputs, outputs)
@@ -166,7 +167,7 @@ field_ini_train = data_folder["field_ini_train"]
 field_fin_train = data_folder["field_fin_train"]
 field_range     = np.arange(field_ini_train,field_fin_train)
 field_range     = np.setdiff1d(field_range, ind_not)
-# np.random.shuffle(field_range)
+#np.random.shuffle(field_range)
 tfrecord_folder = data_folder["tfrecords_folder"]
 test_ratio      = data_folder["test_ratio"]
 prefetch        = data_folder["prefetch"]
@@ -269,13 +270,17 @@ dudy_min  = np.array(ff_norm["dudy_min"])
 dudy_max  = np.array(ff_norm["dudy_max"])
 ff_norm.close()
 error     = 0
-data_test = iter(load_dataset(data_in={"tfrecord_files":tfrecord_files_vali,
-                                       "data_folder":data_folder})["parsed_data"].batch(len(tfrecord_files_vali)))
+#data_test = iter(load_dataset(data_in={"tfrecord_files":tfrecord_files_vali,
+#                                       "data_folder":data_folder})["parsed_data"].batch(len(tfrecord_files_vali)))
+data_test = iter(data_vali)
 data_in_t, data_ou_t = next(data_test)
 data_in_t = data_in_t.numpy()
 data_ou_t = data_ou_t.numpy()
 data_pred = model.predict(data_in_t)
-error     = np.mean(abs(data_pred-data_ou_t)*(u_y15_max-u_y15_min)+u_y15_min)/np.max([abs(u_y15_max),abs(u_y15_min)])*100
+print(np.mean((data_pred-data_ou_t)**2),flush=True)
+error     = np.mean(abs(data_pred-data_ou_t)*(u_y15_max-u_y15_min))/np.max([abs(u_y15_max),abs(u_y15_min)])*100
+results   = model.evaluate(data_in_t,data_ou_t)
+print(results)
 
 data_grid    = read_grid_database(data_in={"data_folder" : data_folder})
 zgrid, xgrid = np.meshgrid(data_grid["zd"][zclip[0]:zclip[1]],data_grid["x"][xclip[0]:xclip[1]])
